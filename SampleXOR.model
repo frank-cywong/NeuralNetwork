@@ -1,0 +1,6 @@
+3 0.05
+2 0 identity
+2 1 lrelu
+0 1 -1 0 -1 1
+1 1 sigmoid
+0 5 5
