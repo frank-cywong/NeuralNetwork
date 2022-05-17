@@ -3,6 +3,9 @@ import java.io.File;
 import java.util.Scanner;
 public class Network{
   // sort of linked list like in terms of storage actually
+  static final int BATCH = 1;
+  static final int STOCHASTIC = 0;
+  int training_mode = BATCH;
   Layer input = null;
   Layer output = null;
   double learning_rate;
@@ -45,7 +48,7 @@ public class Network{
   }
   // Constructs new network from custom file format
   /*
-    N -> total layers, a -> learning rate
+    N -> total layers, a -> learning rate, T -> training mode
     then N segments
     for each segment: X -> size of layer
     then binary flag numbers, 1 << 0: weights given (cant be if first layer), 1 << 1: values given
@@ -54,7 +57,7 @@ public class Network{
     if values given, size numbers in next line for values
     
     Sample:
-    3 0.05
+    3 0.05 0
     2 0 identity
     2 1 lrelu
     0 1 -1 0 -1 1
@@ -68,6 +71,7 @@ public class Network{
       int N = in.nextInt();
       double a = in.nextDouble();
       this.learning_rate = a;
+      training_mode = in.nextInt();
       Layer prevlayer = null;
       for(int i = 0; i < N; i++){
         int X = in.nextInt();
@@ -158,7 +162,7 @@ public class Network{
       }
       s += "\n";
     }
-    s = ("" + layercount + " " + learning_rate + "\n" + s);
+    s = ("" + layercount + " " + learning_rate + " " + training_mode + "\n" + s);
     return s;
   }
   public double[] evaluate(double[] inputValues){
@@ -202,11 +206,16 @@ public class Network{
       curlayer = curlayer.input;
     }
   }
-  // returns error
-  public double trainOneTest(double[] testcase, double[] correct){ // stochastic training for simplicity
+  // returns [error, output values]
+  public double[][] trainOneTest(double[] testcase, double[] correct){
     evaluate(testcase);
-    double rv = (calculate_error(correct, output.values));
-    backpropagate(correct);
+    double[] rv1 = new double[]{(calculate_error(correct, output.values))};
+    double[][] rv = new double[2][];
+    rv[0] = rv1;
+    rv[1] = output.values;
+    if(training_mode == STOCHASTIC){
+      backpropagate(correct);
+    }
     //System.out.println(outputNetwork());
     return rv;
   }
@@ -215,12 +224,32 @@ public class Network{
     if(testcases.length != correctvalues.length){
       throw new IllegalArgumentException("Testcases and correct value count are not equal");
     }
-    double rv = 0;
+    double[][] rv;
+    double errorsum = 0;
+    double[] gradientavg = new double[correctvalues[0].length];
     for(int i = 0; i < testcases.length; i++){
-      rv += trainOneTest(testcases[i], correctvalues[i]);
+      rv = trainOneTest(testcases[i], correctvalues[i]);
+      if(training_mode == BATCH){
+        sumTo(gradientavg, rv[1]);
+      }
+      errorsum += rv[0][0];
     }
-    rv /= testcases.length;
-    return rv;
+    if(training_mode == BATCH){
+      for(int i = 0; i < gradientavg.length; i++){
+        gradientavg[i] /= testcases.length;
+      }
+      backpropagate(gradientavg);
+    }
+    errorsum /= testcases.length;
+    return errorsum;
+  }
+  public static void sumTo(double[] a, double[] b){
+    if(a.length != b.length){
+      throw new IllegalArgumentException("sumTo called with two arrays of different length");
+    }
+    for(int i = 0; i < a.length; i++){
+      a[i] += b[i];
+    }
   }
   public static double square(double x){
     return x * x;
