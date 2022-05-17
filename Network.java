@@ -67,6 +67,7 @@ public class Network{
       Scanner in = new Scanner(f);
       int N = in.nextInt();
       double a = in.nextDouble();
+      this.learning_rate = a;
       Layer prevlayer = null;
       for(int i = 0; i < N; i++){
         int X = in.nextInt();
@@ -193,6 +194,7 @@ public class Network{
     // first thing to calculate, dE/df, where f is the final output, for mean squared error, just 2 * (predicted - actual)
     double[] error_partial_derivs = new double[output.size];
     for(int i = 0; i < output.size; i++){
+      //System.out.println("OUTPUT: " + output.values[i] + ", TARGET: " + target[i]);
       error_partial_derivs[i] = 2 * (output.values[i] - target[i]);
     }
     while(curlayer != input){
@@ -205,6 +207,7 @@ public class Network{
     evaluate(testcase);
     double rv = (calculate_error(correct, output.values));
     backpropagate(correct);
+    //System.out.println(outputNetwork());
     return rv;
   }
   // returns avg error
@@ -224,7 +227,7 @@ public class Network{
   }
   // Uses MSE to calculate error
   public static double calculate_error(double[] target, double[] predicted){
-    System.out.println("Expected: " + target[0] + ", got: " + predicted[0]);
+    //System.out.println("Expected: " + target[0] + ", got: " + predicted[0]);
     if(target.length != predicted.length){
       throw new IllegalArgumentException("Target and predicted lengths do not match");
     }

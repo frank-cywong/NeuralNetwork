@@ -1,3 +1,4 @@
+//import java.util.Arrays;
 public class Layer{
   // step 0: variables
   double learning_rate;
@@ -45,9 +46,12 @@ public class Layer{
   */
   public double[] back_propagation(double[] partial_derivs){
     double[] adj_partial_derivs = new double[partial_derivs.length];
+    //System.out.println("PARTIAL DERIVS: " + Arrays.toString(partial_derivs));
+    //System.out.println("VALUES: " + Arrays.toString(values));
     for(int i = 0; i < partial_derivs.length; i++){
       adj_partial_derivs[i] = partial_derivs[i] * activation_function.compute_derivative(values[i]);
     }
+    //System.out.println("ADJ PARTIAL DERIVS: " + Arrays.toString(adj_partial_derivs));
     double[] output_array = new double[input.size]; // calculate output before we adjust weights
     for(int j = 0; j < input.size; j++){
       double tempsum = 0;
@@ -67,7 +71,10 @@ public class Layer{
     }
     for(int i = 0; i < values.length; i++){
       for(int j = 0; j < input.size + 1; j++){
-        weights[i][j] -= learning_rate - adj_partial_derivs[i] * (j == 0 ? 1 : input.values[j-1]);
+        //System.out.println(adj_partial_derivs[i]);
+        //System.out.println(learning_rate);
+        weights[i][j] -= learning_rate * adj_partial_derivs[i] * (j == 0 ? 1 : input.values[j-1]);
+        //System.out.println("ADJUSTING WEIGHT " + i + ", " + j + " BY: " + learning_rate * adj_partial_derivs[i] * (j == 0 ? 1 : input.values[j-1]));
       }
     }
   }
