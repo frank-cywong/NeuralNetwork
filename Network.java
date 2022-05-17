@@ -3,7 +3,7 @@ import java.io.File;
 import java.util.Scanner;
 public class Network{
   // sort of linked list like in terms of storage actually
-  static final int BATCH = 1;
+  static final int BATCH = 1; // BATCH MODE MAY NOT BE WORKING, COULD NOT GET IT TO WORK FOR XOR, POSSIBLE LOCAL MINIMUM OR IMPLEMENTATION BUG
   static final int STOCHASTIC = 0;
   int training_mode = STOCHASTIC;
   Layer input = null;

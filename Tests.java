@@ -8,7 +8,6 @@ public class Tests{
     System.out.println(Arrays.toString(test1.evaluate(new double[]{1,0})));
     System.out.println(Arrays.toString(test1.evaluate(new double[]{1,1})));
     */
-    /*
     Network test2 = new Network(3, 0.1, new int[] {2, 4, 1}, new String[]{"identity", "lrelu", "sigmoid"});
     //Network test2 = new Network("DebugTest2.model");
     test2.training_mode = 0;
@@ -23,6 +22,5 @@ public class Tests{
     for(int i = 0; i < 4; i++){
       System.out.println(Arrays.toString(test2.evaluate(test2cases[i])));
     }
-    */
   }
 }
