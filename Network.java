@@ -5,7 +5,7 @@ public class Network{
   // sort of linked list like in terms of storage actually
   static final int BATCH = 1;
   static final int STOCHASTIC = 0;
-  int training_mode = BATCH;
+  int training_mode = STOCHASTIC;
   Layer input = null;
   Layer output = null;
   double learning_rate;
@@ -182,39 +182,42 @@ public class Network{
     }
     return output.values;
   }
-  public void randomize_weights(){ // starts each weight off with a random number between 0 and 1
+  public void randomize_weights(){ // starts each weight off with a random number between -1 and 1
     Layer curlayer = input;
     while(curlayer != output){
       curlayer = curlayer.output;
       for(int i = 0; i < curlayer.weights.length; i++){
         for(int j = 0; j < curlayer.weights[i].length; j++){
-          curlayer.weights[i][j] = Math.random();
+          curlayer.weights[i][j] = (Math.random() * 2) - 1;
         }
       }
     }
   }
-  public void backpropagate(double[] target){
-    Layer curlayer = output;
+  public double[] get_error_partial_derivs(double[] target, double[] predicted){
     // first thing to calculate, dE/df, where f is the final output, for mean squared error, just 2 * (predicted - actual)
-    double[] error_partial_derivs = new double[output.size];
+    double[] error_partial_derivs = new double[predicted.length];
     for(int i = 0; i < output.size; i++){
       //System.out.println("OUTPUT: " + output.values[i] + ", TARGET: " + target[i]);
-      error_partial_derivs[i] = 2 * (output.values[i] - target[i]);
+      error_partial_derivs[i] = 2 * (predicted[i] - target[i]);
     }
+    return error_partial_derivs;
+  }
+  public void backpropagate(double[] error_partial_derivs){
+    Layer curlayer = output;
     while(curlayer != input){
       error_partial_derivs = curlayer.back_propagation(error_partial_derivs);
       curlayer = curlayer.input;
     }
   }
-  // returns [error, output values]
+  // returns [error, error partial derivatives relative to output values]
   public double[][] trainOneTest(double[] testcase, double[] correct){
     evaluate(testcase);
     double[] rv1 = new double[]{(calculate_error(correct, output.values))};
     double[][] rv = new double[2][];
     rv[0] = rv1;
-    rv[1] = output.values;
+    rv[1] = get_error_partial_derivs(correct, output.values);
     if(training_mode == STOCHASTIC){
-      backpropagate(correct);
+      backpropagate(rv[1]);
     }
     //System.out.println(outputNetwork());
     return rv;
