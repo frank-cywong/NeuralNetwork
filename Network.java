@@ -235,7 +235,10 @@ public class Network{
       if(training_mode == BATCH){
         sumTo(gradientavg, rv[1]);
       }
-      errorsum += rv[0][0];
+      errorsum += (rv[0][0] / testcases.length);
+      if(i % 500 == 0 && i >= 500){
+        System.out.println("Currently at test case " + i);
+      }
     }
     if(training_mode == BATCH){
       for(int i = 0; i < gradientavg.length; i++){
@@ -243,7 +246,6 @@ public class Network{
       }
       backpropagate(gradientavg);
     }
-    errorsum /= testcases.length;
     return errorsum;
   }
   public static void sumTo(double[] a, double[] b){
