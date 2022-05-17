@@ -75,9 +75,10 @@ public class Network{
         }
         if(i == 0){
           input = curlayer;
+        } else {
+          curlayer.input = prevlayer;
+          prevlayer.output = curlayer;
         }
-        curlayer.input = prevlayer;
-        prevlayer.output = curlayer;
         if(i == (N - 1)){
           output = curlayer;
         }
