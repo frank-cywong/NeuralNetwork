@@ -123,6 +123,43 @@ public class Network{
       throw new IllegalArgumentException("File not found"); // passthrough but in a more standard format
     }
   }
+  public String outputNetwork(){
+    String s = "";
+    int layercount = 1;
+    Layer curlayer = input;
+    // special case for input
+    s += ("" + curlayer.size + " 2 " + curlayer.activation_function + "\n");
+    for(int i = 0; i < curlayer.size; i++){
+      if(i != 0){
+        s += " ";
+      }
+      s += curlayer.values[i];
+    }
+    s += "\n";
+    while(curlayer != output){
+      layercount++;
+      curlayer = curlayer.output;
+      s += ("" + curlayer.size + " 3 " + curlayer.activation_function + "\n");
+      for(int i = 0; i < curlayer.weights.length; i++){
+        for(int j = 0; j < curlayer.weights[i].length; j++){
+          if(i != 0 || j != 0){
+            s += " ";
+          }
+          s += curlayer.weights[i][j];
+        }
+      }
+      s += "\n";
+      for(int i = 0; i < curlayer.size; i++){
+        if(i != 0){
+          s += " ";
+        }
+        s += curlayer.values[i];
+      }
+      s += "\n";
+    }
+    s = ("" + layercount + " " + learning_rate + "\n" + s);
+    return s;
+  }
   public double[] evaluate(double[] inputValues){
     if(input.size != inputValues.length){
       throw new IllegalArgumentException("inputValues length does not match input layer size");
@@ -166,7 +203,7 @@ public class Network{
   // returns error
   public double trainOneTest(double[] testcase, double[] correct){ // stochastic training for simplicity
     evaluate(testcase);
-    double rv = (calculate_error(output.values, correct));
+    double rv = (calculate_error(correct, output.values));
     backpropagate(correct);
     return rv;
   }
@@ -187,6 +224,7 @@ public class Network{
   }
   // Uses MSE to calculate error
   public static double calculate_error(double[] target, double[] predicted){
+    System.out.println("Expected: " + target[0] + ", got: " + predicted[0]);
     if(target.length != predicted.length){
       throw new IllegalArgumentException("Target and predicted lengths do not match");
     }

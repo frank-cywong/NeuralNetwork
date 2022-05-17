@@ -6,4 +6,7 @@ public class SigmoidActivationFunction implements ActivationFunction{
     double expv = Math.exp(-1 * v);
     return(expv / (1 + expv * expv));
   }
+  public String toString(){
+    return "sigmoid";
+  }
 }
