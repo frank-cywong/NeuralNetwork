@@ -35,6 +35,7 @@ public class Network{
       } else {
         prevlayer.output = curlayer;
         curlayer.input = prevlayer;
+        curlayer.weights = new double[curlayer.size][prevlayer.size + 1];
       }
       if(i == (layer_count - 1)){
         output = curlayer;
@@ -155,7 +156,7 @@ public class Network{
     // first thing to calculate, dE/df, where f is the final output, for mean squared error, just 2 * (predicted - actual)
     double[] error_partial_derivs = new double[output.size];
     for(int i = 0; i < output.size; i++){
-      error_partial_derivs = 2 * (output.values[i] - target[i]);
+      error_partial_derivs[i] = 2 * (output.values[i] - target[i]);
     }
     while(curlayer != input){
       error_partial_derivs = curlayer.back_propagation(error_partial_derivs);
