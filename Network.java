@@ -8,6 +8,40 @@ public class Network{
   double learning_rate;
   public Network(){
   }
+  public Network(int layer_count, double learning_rate, int[] layer_sizes, String[] layer_activation_functions){
+    this.learning_rate = learning_rate;
+    Layer prevlayer = null;
+    for(int i = 0; i < layer_count; i++){
+      Layer curlayer = new Layer(layer_sizes[i]);
+      curlayer.learning_rate = learning_rate;
+      switch(layer_activation_functions[i]){
+        case "identity":
+          curlayer.activation_function = new IdentityFunction();
+          break;
+        case "lrelu":
+          curlayer.activation_function = new LeakyReLU();
+          break;
+        case "relu":
+          curlayer.activation_function = new RectifiedLinearActivationFunction();
+          break;
+        case "sigmoid":
+          curlayer.activation_function = new SigmoidActivationFunction();
+          break;
+        default:
+          throw new IllegalArgumentException("No valid activation function detected");
+      }
+      if(i == 0){
+        input = curlayer;
+      } else {
+        prevlayer.output = curlayer;
+        curlayer.input = prevlayer;
+      }
+      if(i == (layer_count - 1)){
+        output = curlayer;
+      }
+      prevlayer = curlayer;
+    }
+  }
   // Constructs new network from custom file format
   /*
     N -> total layers, a -> learning rate
@@ -119,10 +153,33 @@ public class Network{
   public void backpropagate(double[] target){
     Layer curlayer = output;
     // first thing to calculate, dE/df, where f is the final output, for mean squared error, just 2 * (predicted - actual)
-    new double[] error_partial_derivs = new double[output.size];
+    double[] error_partial_derivs = new double[output.size];
     for(int i = 0; i < output.size; i++){
       error_partial_derivs = 2 * (output.values[i] - target[i]);
     }
+    while(curlayer != input){
+      error_partial_derivs = curlayer.back_propagation(error_partial_derivs);
+      curlayer = curlayer.input;
+    }
+  }
+  // returns error
+  public double trainOneTest(double[] testcase, double[] correct){ // stochastic training for simplicity
+    evaluate(testcase);
+    double rv = (calculate_error(output.values, correct));
+    backpropagate(correct);
+    return rv;
+  }
+  // returns avg error
+  public double trainOneEpoch(double[][] testcases, double[][] correctvalues){
+    if(testcases.length != correctvalues.length){
+      throw new IllegalArgumentException("Testcases and correct value count are not equal");
+    }
+    double rv = 0;
+    for(int i = 0; i < testcases.length; i++){
+      rv += trainOneTest(testcases[i], correctvalues[i]);
+    }
+    rv /= testcases.length;
+    return rv;
   }
   public static double square(double x){
     return x * x;
