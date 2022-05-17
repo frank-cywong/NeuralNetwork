@@ -1,5 +1,7 @@
 import java.io.InputStream;
 import java.io.FileInputStream;
+import java.io.FileWriter;
+import java.io.BufferedWriter;
 import java.io.IOException;
 public class MNISTTester{
   public static double[][][] loadTrainingData() throws IOException{
@@ -22,7 +24,7 @@ public class MNISTTester{
       bytes = new byte[768];
       in.read(bytes);
       for(int j = 0; j < 768; j++){
-        data[i][j] = 1.0 / bytes[j]; // normalise
+        data[i][j] = bytes[j] / 255; // normalise
       }
     }
     output[0] = data;
@@ -46,7 +48,10 @@ public class MNISTTester{
           System.out.println("Error for epoch " + i + ": " + error);
         }
       }
-      System.out.println(network.outputNetwork());
+      //System.out.println(network.outputNetwork(false));
+      BufferedWriter writer = new BufferedWriter(new FileWriter(args[4]));
+      writer.write(network.outputNetwork(false));
+      writer.close();
     }
   }
 }

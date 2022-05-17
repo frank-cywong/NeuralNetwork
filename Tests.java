@@ -18,7 +18,7 @@ public class Tests{
       //System.out.println(test2.outputNetwork());
       System.out.println("Error for epoch " + i + ": " + test2.trainOneEpoch(test2cases, test2correct));
     }
-    System.out.println(test2.outputNetwork());
+    System.out.println(test2.outputNetwork(false));
     for(int i = 0; i < 4; i++){
       System.out.println(Arrays.toString(test2.evaluate(test2cases[i])));
     }

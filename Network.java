@@ -128,23 +128,31 @@ public class Network{
       throw new IllegalArgumentException("File not found"); // passthrough but in a more standard format
     }
   }
-  public String outputNetwork(){
+  public String outputNetwork(boolean includeValues){
     String s = "";
     int layercount = 1;
     Layer curlayer = input;
     // special case for input
-    s += ("" + curlayer.size + " 2 " + curlayer.activation_function + "\n");
-    for(int i = 0; i < curlayer.size; i++){
-      if(i != 0){
-        s += " ";
+    if(includeValues){
+      s += ("" + curlayer.size + " 2 " + curlayer.activation_function + "\n");
+      for(int i = 0; i < curlayer.size; i++){
+        if(i != 0){
+          s += " ";
+        }
+        s += curlayer.values[i];
       }
-      s += curlayer.values[i];
+      s += "\n";
+    } else {
+      s += ("" + curlayer.size + " 0 " + curlayer.activation_function + "\n");
     }
-    s += "\n";
     while(curlayer != output){
       layercount++;
       curlayer = curlayer.output;
-      s += ("" + curlayer.size + " 3 " + curlayer.activation_function + "\n");
+      if(includeValues){
+        s += ("" + curlayer.size + " 3 " + curlayer.activation_function + "\n");
+      } else {
+        s += ("" + curlayer.size + " 1 " + curlayer.activation_function + "\n");
+      }
       for(int i = 0; i < curlayer.weights.length; i++){
         for(int j = 0; j < curlayer.weights[i].length; j++){
           if(i != 0 || j != 0){
@@ -154,13 +162,15 @@ public class Network{
         }
       }
       s += "\n";
-      for(int i = 0; i < curlayer.size; i++){
-        if(i != 0){
-          s += " ";
+      if(includeValues){
+        for(int i = 0; i < curlayer.size; i++){
+          if(i != 0){
+            s += " ";
+          }
+          s += curlayer.values[i];
         }
-        s += curlayer.values[i];
+        s += "\n";
       }
-      s += "\n";
     }
     s = ("" + layercount + " " + learning_rate + " " + training_mode + "\n" + s);
     return s;
@@ -237,7 +247,7 @@ public class Network{
       }
       errorsum += (rv[0][0] / testcases.length);
       if(i % 500 == 0 && i >= 500){
-        System.out.println("Currently at test case " + i);
+        System.out.println("Currently at test case " + i + ", current error sum: " + errorsum);
       }
     }
     if(training_mode == BATCH){
@@ -268,6 +278,7 @@ public class Network{
     double sum = 0;
     for(int i = 0; i < target.length; i++){
       sum += square(predicted[i] - target[i]);
+      //System.out.println(predicted[i]);
     }
     sum /= target.length;
     return sum;
