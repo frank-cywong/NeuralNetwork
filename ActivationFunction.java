@@ -1,4 +1,4 @@
 public interface ActivationFunction{
-  public static double compute(double v);
-  public static double compute_derivative(double v);
+  public double compute(double v);
+  public double compute_derivative(double v);
 }

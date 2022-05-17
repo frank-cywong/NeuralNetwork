@@ -1,5 +1,6 @@
 public class Layer{
   // step 0: variables
+  double learning_rate;
   int size;
   Layer input;
   Layer output;
@@ -45,7 +46,7 @@ public class Layer{
   public double[] back_propagation(double[] partial_derivs){
     double[] adj_partial_derivs = new double[partial_derivs.length];
     for(int i = 0; i < partial_derivs.length; i++){
-      adj_partial_derivs[i] = partial_derivs[i] * activation_function.compute_deriative(values[i]);
+      adj_partial_derivs[i] = partial_derivs[i] * activation_function.compute_derivative(values[i]);
     }
     double[] output_array = new double[input.size]; // calculate output before we adjust weights
     for(int j = 0; j < input.size; j++){
@@ -56,16 +57,17 @@ public class Layer{
       output_array[j] = tempsum;
     }
     adjust_weights(partial_derivs);
+    return output_array;
   }
   // just adjust weights without computing input partial derivs, used for first layer and internally
   public void adjust_weights(double[] partial_derivs){
     double[] adj_partial_derivs = new double[partial_derivs.length];
     for(int i = 0; i < partial_derivs.length; i++){
-      adj_partial_derivs[i] = partial_derivs[i] * activation_function.compute_deriative(values[i]);
+      adj_partial_derivs[i] = partial_derivs[i] * activation_function.compute_derivative(values[i]);
     }
     for(int i = 0; i < values.length; i++){
       for(int j = 0; j < input.size + 1; j++){
-        weights[i][j] = adj_partial_derivs[i] * (j == 0 ? 1 : input.values[j-1]);
+        weights[i][j] -= learning_rate - adj_partial_derivs[i] * (j == 0 ? 1 : input.values[j-1]);
       }
     }
   }
