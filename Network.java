@@ -3,8 +3,8 @@ import java.io.File;
 import java.util.Scanner;
 public class Network{
   // sort of linked list like in terms of storage actually
-  Layer input;
-  Layer output;
+  Layer input = null;
+  Layer output = null;
   double learning_rate;
   public Network(){
   }
@@ -86,6 +86,23 @@ public class Network{
     } catch (FileNotFoundException e){
       throw new IllegalArgumentException("File not found"); // passthrough but in a more standard format
     }
+  }
+  public double[] evaluate(double[] inputValues){
+    if(input.size != inputValues.length){
+      throw new IllegalArgumentException("inputValues length does not match input layer size");
+    }
+    for(int i = 0; i < input.size; i++){
+      input.values[i] = inputValues[i];
+    }
+    return evaluate();
+  }
+  public double[] evaluate(){
+    Layer curlayer = input;
+    while(curlayer != output){
+      curlayer = curlayer.output;
+      curlayer.forward_propagation();
+    }
+    return output.values;
   }
   public static double square(double x){
     return x * x;
