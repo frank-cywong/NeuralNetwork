@@ -30,6 +30,32 @@ public class MNISTTester{
     output[0] = data;
     return output;
   }
+  public static double[][][] loadTestingData() throws IOException{
+    double[][][] output = new double[2][][];
+    double[][] labels = new double[10000][10];
+    InputStream in = new FileInputStream("./mnist-raw/t10k-labels.idx1-ubyte");
+    in.read(new byte[8]); // skip first 8 bytes
+    byte[] bytes = new byte[10000];
+    in.read(bytes);
+    for(int i = 0; i < 10000; i++){
+      for(int j = 0; j < 10; j++){
+        labels[i][j] = (bytes[i] == j ? 1 : 0);
+      }
+    }
+    output[1] = labels;
+    in = new FileInputStream("./mnist-raw/t10k-images.idx3-ubyte");
+    in.read(new byte[16]); // skip first 16 bytes
+    double[][] data = new double[10000][768];
+    for(int i = 0; i < 10000; i++){
+      bytes = new byte[768];
+      in.read(bytes);
+      for(int j = 0; j < 768; j++){
+        data[i][j] = bytes[j] / 255; // normalise
+      }
+    }
+    output[0] = data;
+    return output;
+  }
   public static void main(String[] args) throws IOException{
     if(args[0].equals("train")){
       Network network = null;
@@ -52,6 +78,29 @@ public class MNISTTester{
       BufferedWriter writer = new BufferedWriter(new FileWriter(args[4]));
       writer.write(network.outputNetwork(false));
       writer.close();
+    } else if (args[0].equals("test")){
+      Network network = new Network(args[1]);
+      double[][][] testData = loadTestingData();
+      int correctCount = 0;
+      for(int i = 0; i < 10000; i++){
+        double[] predicted = network.evaluate(testData[0][i]);
+        int answer = 0;
+        int predict = 0;
+        double predictmax = 0;
+        for(int j = 0; j < 10; j++){
+          if(predicted[j] > predictmax){
+            predictmax = predicted[j];
+            predict = j;
+          }
+          if(testData[1][i][j] == 1){
+            answer = j;
+          }
+        }
+        if(predict == answer){
+          correctCount++;
+        }
+      }
+      System.out.println("Correct count: " + correctCount + " (" + (correctCount / 100) + "%)");
     }
   }
 }
