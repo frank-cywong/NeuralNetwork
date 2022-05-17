@@ -105,6 +105,17 @@ public class Network{
     }
     return output.values;
   }
+  public void randomize_weights(){ // starts each weight off with a random number between 0 and 1
+    Layer curlayer = input;
+    while(curlayer != output){
+      curlayer = curlayer.output;
+      for(int i = 0; i < curlayer.weights.length; i++){
+        for(int j = 0; j < curlayer.weights[i].length; j++){
+          curlayer.weights[i][j] = Math.random();
+        }
+      }
+    }
+  }
   public static double square(double x){
     return x * x;
   }
