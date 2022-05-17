@@ -116,10 +116,18 @@ public class Network{
       }
     }
   }
+  public void backpropagate(double[] target){
+    Layer curlayer = output;
+    // first thing to calculate, dE/df, where f is the final output, for mean squared error, just 2 * (predicted - actual)
+    new double[] error_partial_derivs = new double[output.size];
+    for(int i = 0; i < output.size; i++){
+      error_partial_derivs = 2 * (output.values[i] - target[i]);
+    }
+  }
   public static double square(double x){
     return x * x;
   }
-  // Uses RMS to calculate error
+  // Uses MSE to calculate error
   public static double calculate_error(double[] target, double[] predicted){
     if(target.length != predicted.length){
       throw new IllegalArgumentException("Target and predicted lengths do not match");
@@ -129,6 +137,6 @@ public class Network{
       sum += square(predicted[i] - target[i]);
     }
     sum /= target.length;
-    return Math.sqrt(sum);
+    return sum;
   }
 }
