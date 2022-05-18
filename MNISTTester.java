@@ -60,7 +60,8 @@ public class MNISTTester{
     if(args[0].equals("train")){
       Network network = null;
       if(args[1].equals("new")){
-        network = new Network(4, 0.1, new int[] {768, 128, 74, 10}, new String[] {"identity", "lrelu", "lrelu", "sigmoid"});
+        network = new Network(4, 0.5, new int[] {768, 50, 20, 10}, new String[] {"identity", "sigmoid", "sigmoid", "softmax"});
+        network.loss_function = new LogLoss();
         network.randomize_weights();
       } else {
         network = new Network(args[1]);
@@ -75,6 +76,7 @@ public class MNISTTester{
         }
       }
       //System.out.println(network.outputNetwork(false));
+      System.out.println("Outputting new network");
       BufferedWriter writer = new BufferedWriter(new FileWriter(args[4]));
       writer.write(network.outputNetwork(false));
       writer.close();

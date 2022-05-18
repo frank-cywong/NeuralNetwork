@@ -275,7 +275,7 @@ public class Network{
         sumTo(gradientavg, rv[1]);
       }
       errorsum += (rv[0][0] / testcases.length);
-      if(i % 500 == 0 && i >= 500){
+      if(i % 10000 == 0 && i >= 10000){
         System.out.println("Currently at test case " + i + ", current error sum: " + errorsum);
       }
     }
