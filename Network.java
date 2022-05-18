@@ -89,7 +89,9 @@ public class Network{
         case "MSE":
           this.loss_function = new MSE();
           break;
-        // to do: add logloss
+        case "LogLoss":
+          this.loss_function = new LogLoss();
+          break;
         default:
           throw new IllegalArgumentException("Loss function not recognised");
       }

@@ -25,14 +25,14 @@ public class Tests{
     }
     */
     // XOR, but if 0, set node 0 to 1, if 1, set node 1 to 1
-    Network test3 = new Network(3, 0.1, new int[] {2, 5, 2}, new String[]{"identity", "lrelu", "softmax"});
-    //Network test2 = new Network("XOR-Sigmoid-BackpropagationTrained.model");
-    test3.training_mode = 0;
-    test3.randomize_weights();
-    test3.loss_function = new LogLoss();
+    //Network test3 = new Network(3, 0.1, new int[] {2, 5, 2}, new String[]{"identity", "lrelu", "softmax"});
+    Network test3 = new Network("XOR-SoftmaxLogLoss-BackpropagationTrained.model");
+    //test3.training_mode = 0;
+    //test3.randomize_weights();
+    //test3.loss_function = new LogLoss();
     double[][] test3cases = new double[][]{{0, 0}, {0, 1}, {1, 0}, {1, 1}};
     double[][] test3correct = new double[][]{{1, 0}, {0, 1}, {0, 1}, {1, 0}};
-    for(int i = 0; i < 10000; i++){
+    for(int i = 0; i < 1; i++){
       //System.out.println(test3.outputNetwork());
       System.out.println("Error for epoch " + i + ": " + test3.trainOneEpoch(test3cases, test3correct));
     }
