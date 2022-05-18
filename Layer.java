@@ -48,8 +48,9 @@ public class Layer{
     double[] adj_partial_derivs = new double[partial_derivs.length];
     //System.out.println("PARTIAL DERIVS: " + Arrays.toString(partial_derivs));
     //System.out.println("VALUES: " + Arrays.toString(values));
+    double[] activation_function_partial_derivs = activation_function.compute_derivative(values);
     for(int i = 0; i < partial_derivs.length; i++){
-      adj_partial_derivs[i] = partial_derivs[i] * activation_function.compute_derivative(values[i]);
+      adj_partial_derivs[i] = partial_derivs[i] * activation_function_partial_derivs[i];
     }
     //System.out.println("ADJ PARTIAL DERIVS: " + Arrays.toString(adj_partial_derivs));
     double[] output_array = new double[input.size]; // calculate output before we adjust weights
@@ -60,15 +61,17 @@ public class Layer{
       }
       output_array[j] = tempsum;
     }
-    adjust_weights(partial_derivs);
+    adjust_weights(adj_partial_derivs);
     return output_array;
   }
-  // just adjust weights without computing input partial derivs, used for first layer and internally
-  public void adjust_weights(double[] partial_derivs){
+  // just adjust weights without computing input partial derivs, used for first layer and internally, input should be adjusted for the activation function already
+  public void adjust_weights(double[] adj_partial_derivs){
+    /*
     double[] adj_partial_derivs = new double[partial_derivs.length];
     for(int i = 0; i < partial_derivs.length; i++){
       adj_partial_derivs[i] = partial_derivs[i] * activation_function.compute_derivative(values[i]);
     }
+    */
     for(int i = 0; i < values.length; i++){
       for(int j = 0; j < input.size + 1; j++){
         //System.out.println(adj_partial_derivs[i]);

@@ -1,4 +1,4 @@
-public class MSE implements LossFunction{
+public class LogLoss implements LossFunction{
   public double compute_loss(double[] target, double[] predicted){
     if(target.length != predicted.length){
       throw new IllegalArgumentException("Target and predicted lengths do not match");
