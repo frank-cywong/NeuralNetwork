@@ -15,5 +15,11 @@ public interface ActivationFunction{
     }
     return output;
   }
+  public default double[][] compute_derivative_matrix(double[] v){
+    throw new UnsupportedOperationException("Output for this activation function is a vector, not a matrix");
+  }
+  public default int returnValType(){
+    return 1; // 1 for 1D, 2 for 2D
+  }
   public String toString();
 }

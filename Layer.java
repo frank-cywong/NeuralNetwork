@@ -51,9 +51,18 @@ public class Layer{
     double[] adj_partial_derivs = new double[partial_derivs.length];
     //System.out.println("PARTIAL DERIVS: " + Arrays.toString(partial_derivs));
     //System.out.println("VALUES: " + Arrays.toString(values));
-    double[] activation_function_partial_derivs = activation_function.compute_derivative(values);
-    for(int i = 0; i < partial_derivs.length; i++){
-      adj_partial_derivs[i] = partial_derivs[i] * activation_function_partial_derivs[i];
+    if(activation_function.returnValType() == 1){
+      double[] activation_function_partial_derivs = activation_function.compute_derivative(values);
+      for(int i = 0; i < partial_derivs.length; i++){
+        adj_partial_derivs[i] = partial_derivs[i] * activation_function_partial_derivs[i];
+      }
+    } else {
+      double[][] activation_function_derivative_matrix = activation_function.compute_derivative_matrix(values);
+      for(int i = 0; i < partial_derivs.length; i++){
+        for(int j = 0; j < partial_derivs.length; j++){
+          adj_partial_derivs[i] += partial_derivs[j] * activation_function_derivative_matrix[j][i];
+        }
+      }
     }
     //System.out.println("ADJ PARTIAL DERIVS: " + Arrays.toString(adj_partial_derivs));
     double[] output_array = new double[input.size]; // calculate output before we adjust weights
