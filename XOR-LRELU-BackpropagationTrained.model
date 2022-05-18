@@ -1,4 +1,4 @@
-3 0.1 0
+3 0.1 0 1 MSE
 2 2 identity
 1.0 1.0
 4 3 lrelu

@@ -5,10 +5,12 @@ public class Network{
   // sort of linked list like in terms of storage actually
   static final int BATCH = 1; // BATCH MODE MAY NOT BE WORKING, COULD NOT GET IT TO WORK FOR XOR, POSSIBLE LOCAL MINIMUM OR IMPLEMENTATION BUG
   static final int STOCHASTIC = 0;
+  static final int VERSION_NUMBER = 1;
   int training_mode = STOCHASTIC;
   Layer input = null;
   Layer output = null;
   double learning_rate;
+  LossFunction loss_function = new MSE(); // by default use MSE
   public Network(){
   }
   public Network(int layer_count, double learning_rate, int[] layer_sizes, String[] layer_activation_functions){
@@ -48,7 +50,7 @@ public class Network{
   }
   // Constructs new network from custom file format
   /*
-    N -> total layers, a -> learning rate, T -> training mode
+    N -> total layers, a -> learning rate, T -> training mode, v -> model version (in case i add more things its backwards compatible), L -> loss function type (MSE or log loss)
     then N segments
     for each segment: X -> size of layer
     then binary flag numbers, 1 << 0: weights given (cant be if first layer), 1 << 1: values given
@@ -57,7 +59,7 @@ public class Network{
     if values given, size numbers in next line for values
     
     Sample:
-    3 0.05 0
+    3 0.05 0 1 MSE
     2 0 identity
     2 1 lrelu
     0 1 -1 0 -1 1
@@ -72,6 +74,22 @@ public class Network{
       double a = in.nextDouble();
       this.learning_rate = a;
       training_mode = in.nextInt();
+      int v = in.nextInt();
+      switch(v){
+        case 1:
+          break;
+        default:
+          throw new IllegalArgumentException("Version number not recognised");
+      }
+      String lossfunction = in.next();
+      switch(lossfunction){
+        case "MSE":
+          this.loss_function = new MSE();
+          break;
+        // to do: add logloss
+        default:
+          throw new IllegalArgumentException("Loss function not recognised");
+      }
       Layer prevlayer = null;
       for(int i = 0; i < N; i++){
         int X = in.nextInt();
@@ -172,7 +190,7 @@ public class Network{
         s += "\n";
       }
     }
-    s = ("" + layercount + " " + learning_rate + " " + training_mode + "\n" + s);
+    s = ("" + layercount + " " + learning_rate + " " + training_mode + " " + VERSION_NUMBER + " " + loss_function + "\n" + s);
     return s;
   }
   public double[] evaluate(double[] inputValues){
@@ -205,12 +223,15 @@ public class Network{
   }
   public double[] get_error_partial_derivs(double[] target, double[] predicted){
     // first thing to calculate, dE/df, where f is the final output, for mean squared error, just 2 * (predicted - actual)
+    /*
     double[] error_partial_derivs = new double[predicted.length];
     for(int i = 0; i < output.size; i++){
       //System.out.println("OUTPUT: " + output.values[i] + ", TARGET: " + target[i]);
       error_partial_derivs[i] = 2 * (predicted[i] - target[i]);
     }
     return error_partial_derivs;
+    */
+    return loss_function.compute_derivative(target, predicted);
   }
   public void backpropagate(double[] error_partial_derivs){
     Layer curlayer = output;
@@ -222,7 +243,7 @@ public class Network{
   // returns [error, error partial derivatives relative to output values]
   public double[][] trainOneTest(double[] testcase, double[] correct){
     evaluate(testcase);
-    double[] rv1 = new double[]{(calculate_error(correct, output.values))};
+    double[] rv1 = new double[]{(loss_function.compute_loss(correct, output.values))};
     double[][] rv = new double[2][];
     rv[0] = rv1;
     rv[1] = get_error_partial_derivs(correct, output.values);
@@ -266,6 +287,7 @@ public class Network{
       a[i] += b[i];
     }
   }
+  /*
   public static double square(double x){
     return x * x;
   }
@@ -283,4 +305,5 @@ public class Network{
     sum /= target.length;
     return sum;
   }
+  */
 }
