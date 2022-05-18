@@ -16,13 +16,16 @@ public class Layer{
   }
   // step 1: forward propagation
   public void forward_propagation(){
+    double[] preactivation_vector = new double[size];
     for(int i = 0; i < size; i++){
       double tempv = weights[i][0]; // constant term
       for(int j = 0; j < input.size; j++){
         tempv += weights[i][j+1] * input.values[j];
       }
-      values[i] = activation_function.compute(tempv);
+      //values[i] = activation_function.compute(tempv);
+      preactivation_vector[i] = tempv;
     }
+    values = activation_function.compute(preactivation_vector);
   }
   // step 2: back propagate to adjust weights
   /*
