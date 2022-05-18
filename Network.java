@@ -32,6 +32,9 @@ public class Network{
         case "sigmoid":
           curlayer.activation_function = new SigmoidActivationFunction();
           break;
+        case "softmax":
+          curlayer.activation_function = new Softmax();
+          break;
         default:
           throw new IllegalArgumentException("No valid activation function detected");
       }
@@ -109,6 +112,9 @@ public class Network{
             break;
           case "sigmoid":
             curlayer.activation_function = new SigmoidActivationFunction();
+            break;
+          case "softmax":
+            curlayer.activation_function = new Softmax();
             break;
           default:
             throw new IllegalArgumentException("No valid activation function detected");
