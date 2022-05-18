@@ -13,6 +13,7 @@ public class MSE implements LossFunction{
     return sum;
   }
   public double[] compute_derivative(double[] target, double[] predicted){
+    // dE / dP(i) = (if target is true: -1/N * 1/pi, if target is false: 1/N * 1/(1-pi)), where pi is the ith component of the prediction vector
     if(target.length != predicted.length){
       throw new IllegalArgumentException("Target and predicted lengths do not match");
     }
@@ -20,7 +21,7 @@ public class MSE implements LossFunction{
     double[] error_partial_derivs = new double[predicted.length];
     for(int i = 0; i < predicted.length; i++){
       //System.out.println("OUTPUT: " + output.values[i] + ", TARGET: " + target[i]);
-      error_partial_derivs[i] = 2 * (predicted[i] - target[i]);
+      error_partial_derivs[i] = (target[i] == 1 ? -1.0 / predicted.length / predicted[i] : 1.0 / predicted.length / (1 - predicted[i]));
     }
     return error_partial_derivs;
   }
