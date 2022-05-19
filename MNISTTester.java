@@ -3,6 +3,7 @@ import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.util.Arrays;
 public class MNISTTester{
   public static double[][][] loadTrainingData() throws IOException{
     double[][][] output = new double[2][][];
@@ -17,16 +18,27 @@ public class MNISTTester{
       }
     }
     output[1] = labels;
+    //System.out.println(Arrays.toString(labels[0]));
     in = new FileInputStream("./mnist-raw/train-images.idx3-ubyte");
     in.read(new byte[16]); // skip first 16 bytes
-    double[][] data = new double[60000][768];
+    double[][] data = new double[60000][784];
     for(int i = 0; i < 60000; i++){
-      bytes = new byte[768];
+      bytes = new byte[784];
       in.read(bytes);
-      for(int j = 0; j < 768; j++){
-        data[i][j] = bytes[j] / 255; // normalise
+      for(int j = 0; j < 784; j++){
+        /*
+        if(i == 0 && j == 0){
+          System.out.println(Arrays.toString(bytes));
+        }
+        */
+        double temp = (double)(bytes[j]);
+        if(temp < 0){
+          temp = 256 - temp;
+        }
+        data[i][j] = temp / 255.0; // normalise
       }
     }
+    //System.out.println(Arrays.toString(data[0]));
     output[0] = data;
     return output;
   }
@@ -45,12 +57,16 @@ public class MNISTTester{
     output[1] = labels;
     in = new FileInputStream("./mnist-raw/t10k-images.idx3-ubyte");
     in.read(new byte[16]); // skip first 16 bytes
-    double[][] data = new double[10000][768];
+    double[][] data = new double[10000][784];
     for(int i = 0; i < 10000; i++){
-      bytes = new byte[768];
+      bytes = new byte[784];
       in.read(bytes);
-      for(int j = 0; j < 768; j++){
-        data[i][j] = bytes[j] / 255; // normalise
+      for(int j = 0; j < 784; j++){
+        double temp = (double)(bytes[j]);
+        if(temp < 0){
+          temp = 256 - temp;
+        }
+        data[i][j] = temp / 255.0; // normalise
       }
     }
     output[0] = data;
@@ -60,7 +76,7 @@ public class MNISTTester{
     if(args[0].equals("train")){
       Network network = null;
       if(args[1].equals("new")){
-        network = new Network(4, 0.5, new int[] {768, 50, 20, 10}, new String[] {"identity", "sigmoid", "sigmoid", "softmax"});
+        network = new Network(4, 0.5, new int[] {784, 50, 20, 10}, new String[] {"identity", "sigmoid", "sigmoid", "softmax"});
         network.loss_function = new LogLoss();
         network.randomize_weights();
       } else {
@@ -103,6 +119,15 @@ public class MNISTTester{
         }
       }
       System.out.println("Correct count: " + correctCount + " (" + (correctCount / 100) + "%)");
+    } else if (args[0].equals("debugimages")){
+      double[][][] trainingData = loadTrainingData();
+      for(int i = 0; i < 784; i++){ // first image
+        //System.out.println(trainingData[0][0][i]);
+        if(i % 28 == 0){
+          System.out.print("\n");
+        }
+        System.out.print(trainingData[0][0][i] > 0.5 ? "#" : ".");
+      }
     }
   }
 }
