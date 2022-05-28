@@ -10,13 +10,20 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 public class InteractiveMNISTTester extends JPanel{
-  double[] pixelValues = new double[768];
+  double[] pixelValues = new double[784];
   public InteractiveMNISTTester(){
     setBackground(Color.BLACK);
     setPreferredSize(new Dimension(448, 448));
     addMouseListener(new MouseAdapter(){
       public void mousePressed(MouseEvent me){
         setPixel(me.getX(), me.getY());
+      }
+    });
+    addMouseMotionListener(new MouseAdapter(){
+      public void mouseDragged(MouseEvent me){
+        if(me.getX() < 448 && me.getY() < 448){
+          setPixel(me.getX(), me.getY());
+        }
       }
     });
   }
@@ -52,7 +59,26 @@ public class InteractiveMNISTTester extends JPanel{
     JButton button = new JButton("Classify digit");
     button.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent e){
-        System.out.println("test");
+        Network network = new Network("MNISTSoftmaxTest25Epochs94Percent.model");
+        double[] predicted = network.evaluate(panel.pixelValues);
+        int predict = 0;
+        double predictmax = 0;
+        for(int j = 0; j < 10; j++){
+          if(predicted[j] > predictmax){
+            predictmax = predicted[j];
+            predict = j;
+          }
+        }
+        System.out.println("Digit classified as: " + predict + ", with " + (double)Math.round(predictmax * 1000) / 1000.0 + " confidence");
+        System.out.print("Full confidence values: ");
+        for(int j = 0; j < 10; j++){
+          if(j != 0){
+            System.out.print("; ");
+          }
+          System.out.print("Digit " + j + ": " + (double)Math.round(predicted[j] * 1000) / 1000.0);
+        }
+        System.out.print("\n");
+        System.exit(0);
       }
     });
     controls.add(button);
