@@ -1,6 +1,7 @@
 import java.io.FileNotFoundException;
 import java.io.File;
 import java.util.Scanner;
+import java.io.InputStream;
 public class Network{
   // sort of linked list like in terms of storage actually
   static final int BATCH = 1; // BATCH MODE MAY NOT BE WORKING, COULD NOT GET IT TO WORK FOR XOR, POSSIBLE LOCAL MINIMUM OR IMPLEMENTATION BUG
@@ -71,7 +72,8 @@ public class Network{
   */
   public Network(String filename){
     try {
-      File f = new File(filename);
+      InputStream f = Network.class.getResourceAsStream(filename);
+      //File f = new File(filename);
       Scanner in = new Scanner(f);
       int N = in.nextInt();
       double a = in.nextDouble();
@@ -150,8 +152,8 @@ public class Network{
         }
         prevlayer = curlayer;
       }
-    } catch (FileNotFoundException e){
-      throw new IllegalArgumentException("File not found"); // passthrough but in a more standard format
+    } catch (Exception e){
+      throw new IllegalArgumentException("Exception happened"); // passthrough but in a more standard format
     }
   }
   public String outputNetwork(boolean includeValues){
