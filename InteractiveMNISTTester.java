@@ -5,10 +5,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+//import java.awt.GridBagConstraints;
+//import java.awt.GridBagLayout;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JLabel;
 public class InteractiveMNISTTester extends JPanel{
   double[] pixelValues = new double[784];
   public InteractiveMNISTTester(){
@@ -57,6 +60,21 @@ public class InteractiveMNISTTester extends JPanel{
     frame.getContentPane().add(panel);
     JPanel controls = new JPanel();
     JButton button = new JButton("Classify digit");
+    JLabel result = new JLabel();
+    controls.setLayout(new BoxLayout(controls, BoxLayout.Y_AXIS));
+    //GridBagConstraints gbc = new GridBagConstraints();
+    result.setText("  Results will appear here!                       ");
+    result.setVisible(true);
+    JLabel result2 = new JLabel();
+    JLabel result3 = new JLabel();
+    JLabel result4 = new JLabel();
+    JLabel padding = new JLabel();
+    result2.setText("                                                                                              ");
+    result2.setVisible(true);
+    result3.setVisible(true);
+    result4.setVisible(true);
+    padding.setText("                                                                                              ");
+    padding.setVisible(true);
     button.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent e){
         Network network = new Network("MNISTSoftmaxTest25Epochs94Percent.model");
@@ -69,22 +87,41 @@ public class InteractiveMNISTTester extends JPanel{
             predict = j;
           }
         }
-        System.out.println("Digit classified as: " + predict + ", with " + (double)Math.round(predictmax * 1000) / 1000.0 + " confidence");
-        System.out.print("Full confidence values: ");
-        for(int j = 0; j < 10; j++){
+        String outputstring = "Digit classified as: " + predict + ", with " + (double)Math.round(predictmax * 1000) / 1000.0 + " confidence";
+        String outputstring2 = "Full confidence values: ";
+        String outputstring3 = "";
+        for(int j = 0; j < 5; j++){
           if(j != 0){
-            System.out.print("; ");
+            outputstring3 += "; ";
           }
-          System.out.print("Digit " + j + ": " + (double)Math.round(predicted[j] * 1000) / 1000.0);
+          outputstring3 += ("" + j + ": " + (double)Math.round(predicted[j] * 1000) / 1000.0);
         }
-        System.out.print("\n");
-        System.exit(0);
+        String outputstring4 = "";
+        for(int j = 5; j < 10; j++){
+          if(j != 5){
+            outputstring4 += "; ";
+          }
+          outputstring4 += ("" + j + ": " + (double)Math.round(predicted[j] * 1000) / 1000.0);
+        }
+        //System.out.print("\n");
+        //System.exit(0);
+        result.setText(outputstring);
+        result2.setText(outputstring2);
+        result3.setText(outputstring3);
+        result4.setText(outputstring4);
+        panel.pixelValues = new double[784];
+        panel.repaint();
       }
     });
     controls.add(button);
+    controls.add(result);
+    controls.add(result2);
+    controls.add(result3);
+    controls.add(result4);
+    controls.add(padding);
     frame.getContentPane().add(controls);
-    //448 x 448 drawing area, additional 152 pixels to the right for output
-    frame.setSize(600, 448);
+    //448 x 448 drawing area, additional 952 pixels to the right for output
+    frame.setSize(1400, 448);
     frame.pack();
     frame.setVisible(true);
     frame.setResizable(false);
